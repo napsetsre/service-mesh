@@ -13,15 +13,7 @@ metadata:
   namespace: bookinfo-istio-system
 spec:
   version: v2.1
-  tracing:
-    type: Jaeger
-    sampling: 10000
   addons:
-    jaeger:
-      name: jaeger
-      install:
-        storage:
-          type: Memory
     kiali:
       enabled: true
       name: kiali
