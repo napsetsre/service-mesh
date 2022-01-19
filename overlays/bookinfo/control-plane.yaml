@@ -12,7 +12,7 @@ metadata:
   name: basic
   namespace: bookinfo-istio-system
 spec:
-  version: v2.0
+  version: v2.1
   tracing:
     type: Jaeger
     sampling: 10000
@@ -30,6 +30,8 @@ spec:
   security:
     trust:
     manageNetworkPolicy: true
+    dataPlane:
+      mtls: true
 ---
 apiVersion: maistra.io/v1
 kind: ServiceMeshMemberRoll
