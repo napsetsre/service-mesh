@@ -17,6 +17,8 @@ spec:
     sampling: 100
     type: Jaeger
   addons:
+    prometheus:
+      scrape: true
     jaeger:
       name: jaeger
       install:
