@@ -13,7 +13,25 @@ metadata:
   namespace: bookinfo-istio-system
 spec:
   version: v2.1
+  tracing:
+    sampling: 100
+    type: Jaeger
   addons:
+    jaeger:
+      name: jaeger
+      install:
+        storage:
+          type: Elasticsearch
+        ingress:
+          enabled: true
+  runtime:
+    defaults:
+      container:
+        imagePullPolicy: Always
+    components:
+      tracing.jaeger.elasticsearch: # only supports resources and image name
+        container:
+          resources: {}
     kiali:
       enabled: true
       name: kiali

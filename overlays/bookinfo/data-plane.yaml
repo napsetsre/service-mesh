@@ -29,12 +29,6 @@ spec:
     - name: v1
       labels:
         version: v1
-    - name: v2
-      labels:
-        version: v2
-    - name: v3
-      labels:
-        version: v3
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
@@ -432,22 +426,6 @@ spec:
             host: productpage
             port:
               number: 9080
----
-apiVersion: security.istio.io/v1beta1
-kind: AuthorizationPolicy
-metadata:
-  name: bookinfo-deny
-  namespace: bookinfo
-spec:
-  selector:
-    matchLabels:
-      app: bookinfo
-      version: v1
-  action: DENY
-  rules:
-    - from:
-        - source:
-            notNamespaces: ["bookinfo"]
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
