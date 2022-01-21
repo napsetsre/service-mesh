@@ -32,6 +32,11 @@ spec:
           type: Elasticsearch
         ingress:
           enabled: true
+    kiali:
+      enabled: true
+      name: kiali
+    grafana:
+      enabled: true
   runtime:
     defaults:
       container:
@@ -40,11 +45,6 @@ spec:
       tracing.jaeger.elasticsearch: # only supports resources and image name
         container:
           resources: {}
-    kiali:
-      enabled: true
-      name: kiali
-    grafana:
-      enabled: true
   security:
     trust:
     manageNetworkPolicy: true

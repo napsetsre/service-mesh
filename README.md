@@ -25,10 +25,18 @@ git clone https://github.com/napsetsre/service-mesh.git
 ## Install
 Install the `service-mesh`.
 ```shell
-kustomize build . | oc apply -f-h
+kustomize build . | oc apply -f-
 ```
 
+## Restart(Mac)
+If your deployment uses automatic sidecar injection, you can update the pod template in the deployment by adding or modifying an annotation. Run the following command to redeploy the pods:
+```shell
+oc patch deployment/<deployment> -n <namespace> -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date -r seconds`'"}}}}}'
+```
 
-openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -subj '/O=example Inc./CN=example.com' -keyout example.com.key -out example.com.crt
+### Traffic Routing
+You can think of virtual services as how you route your traffic to a given destination, and then you use destination rules to configure what happens to traffic for that destination. 
 
-openssl req -out httpbin.example.com.csr -newkey rsa:2048 -nodes -keyout httpbin.example.com.key -subj "/CN=httpbin.example.com/O=httpbin organization"
+* **Virtual service** lets you configure how requests are routed to a service.
+* 
+* **Destination Rule** are rules applied to traffic after they have been routed to a destination by a **Virtual Service**.
