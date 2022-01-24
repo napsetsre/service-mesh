@@ -49,7 +49,10 @@ spec:
     trust:
     manageNetworkPolicy: true
     dataPlane:
-      mtls: true
+      mtls: true # For outgoing service calls see PeerAuthentication: https://docs.openshift.com/container-platform/4.8/service_mesh/v2x/ossm-security.html#ossm-security-mtls-sidecars-incoming-services_ossm-security
+    controlPlane:
+      tls:
+        minProtocolVersion: TLS_AUTO
 ---
 apiVersion: maistra.io/v1
 kind: ServiceMeshMemberRoll
