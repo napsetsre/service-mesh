@@ -1,15 +1,12 @@
 #!/bin/bash
 
-
+# Apply changes
 kustomize build . | oc apply -f-
-sleep 5
-oc patch deployment/productpage-v1 -n bookinfo -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date +%s`'"}}}}}'
-oc patch deployment/details-v1 -n bookinfo -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date +%s`'"}}}}}'
-oc patch deployment/details-v2 -n bookinfo -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date +%s`'"}}}}}'
-oc patch deployment/reviews-v1 -n bookinfo -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date +%s`'"}}}}}'
-oc patch deployment/reviews-v2 -n bookinfo -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date +%s`'"}}}}}'
-oc patch deployment/reviews-v3 -n bookinfo -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date +%s`'"}}}}}'
-oc patch deployment/ratings-v1 -n bookinfo -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date +%s`'"}}}}}'
-oc patch deployment/ratings-v2 -n bookinfo -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date +%s`'"}}}}}'
-oc patch deployment/ratings-v2-mysql -n bookinfo -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date +%s`'"}}}}}'
-oc patch deployment/ratings-v2-mysql-vm -n bookinfo -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date +%s`'"}}}}}'
+
+# Redeploy
+DEPLOYMENTS=( productpage-v1 details-v1 details-v2 reviews-v2 reviews-v3 ratings-v1 ratings-v2 ratings-v2-mysql ratings-v2-mysql-vm mongodb-v1 )
+NAMESPACE="bookinfo"
+for deployment in "${DEPLOYMENTS[@]}"
+do
+   oc patch deployment/${deployment} -n $NAMESPACE -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date +%s`'"}}}}}'
+done
