@@ -69,8 +69,8 @@ spec:
       labels:
         version: v1
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: details-v2
   namespace: bookinfo
@@ -80,9 +80,18 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: details
-      version: v2
+    app: details
+    version: v2
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - details
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-details-v2:2.1.0
+      type: ImageChange
   template:
     metadata:
       annotations:
@@ -93,13 +102,38 @@ spec:
     spec:
       containers:
         - name: details
-          image: quay.io/maistra/examples-bookinfo-details-v2:2.1.0
+          image: examples-bookinfo-details-v2
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9080
           env:
             - name: DO_NOT_ENCRYPT
               value: "true"
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: examples-bookinfo-details-v2
+  labels:
+    app: details
+    version: v2
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: "2.1.0"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-details-v2:2.1.0
 ---
 ##################################################################################################
 # Details service
@@ -127,8 +161,8 @@ metadata:
   labels:
     account: details
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: details-v1
   namespace: bookinfo
@@ -138,9 +172,18 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: details
-      version: v1
+    app: details
+    version: v1
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - details
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-details-v1:2.1.0
+      type: ImageChange
   template:
     metadata:
       annotations:
@@ -152,10 +195,35 @@ spec:
       serviceAccountName: bookinfo-details
       containers:
         - name: details
-          image: quay.io/maistra/examples-bookinfo-details-v1:2.1.0
+          image: examples-bookinfo-details-v1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9080
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: examples-bookinfo-details-v1
+  labels:
+    app: details
+    version: v1
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: "2.1.0"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-details-v1:2.1.0
 ---
 ##################################################################################################
 # Ratings service
@@ -183,8 +251,8 @@ metadata:
   labels:
     account: ratings
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: ratings-v1
   namespace: bookinfo
@@ -194,9 +262,18 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: ratings
-      version: v1
+    app: ratings
+    version: v1
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - ratings
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-ratings-v1:2.1.0
+      type: ImageChange
   template:
     metadata:
       annotations:
@@ -208,35 +285,72 @@ spec:
       serviceAccountName: bookinfo-ratings
       containers:
         - name: ratings
-          image: quay.io/maistra/examples-bookinfo-ratings-v1:2.1.0
+          image: examples-bookinfo-ratings-v1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9080
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: examples-bookinfo-ratings-v1
+  labels:
+    app: ratings
+    version: v1
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: "2.1.0"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-ratings-v1:2.1.0
+---
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: ratings-v2-mysql-vm
   labels:
     app: ratings
-    version: v2-mysql-vm
+    version: v2
+    type: mysql-vm
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: ratings
-      version: v2-mysql-vm
+    app: ratings
+    version: v2
+    type: mysql-vm
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - ratings
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-ratings-v2:2.1.0
+      type: ImageChange
   template:
     metadata:
       annotations:
         sidecar.istio.io/inject: "true"
       labels:
         app: ratings
-        version: v2-mysql-vm
+        version: v2
+        type: mysql-vm
     spec:
       containers:
         - name: ratings
-          image: quay.io/maistra/examples-bookinfo-ratings-v2:2.1.0
+          image: examples-bookinfo-ratings-v2
           imagePullPolicy: IfNotPresent
           env:
             # This assumes you registered your mysql vm as
@@ -253,31 +367,52 @@ spec:
               value: password
           ports:
             - containerPort: 9080
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: ratings-v2-mysql
   labels:
     app: ratings
-    version: v2-mysql
+    version: v2
+    type: mysql
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: ratings
-      version: v2-mysql
+    app: ratings
+    version: v2
+    type: mysql
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - ratings
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-ratings-v2:2.1.0
+      type: ImageChange
   template:
     metadata:
       annotations:
         sidecar.istio.io/inject: "true"
       labels:
         app: ratings
-        version: v2-mysql
+        version: v2
+        type: mysql
     spec:
       containers:
         - name: ratings
-          image: quay.io/maistra/examples-bookinfo-ratings-v2:2.1.0
+          image: examples-bookinfo-ratings-v2
           imagePullPolicy: IfNotPresent
           env:
             # ratings-v2 will use mongodb as the default db backend.
@@ -297,14 +432,23 @@ spec:
               value: password
           ports:
             - containerPort: 9080
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: bookinfo-ratings-v2
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: ratings-v2
   labels:
@@ -313,9 +457,18 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: ratings
-      version: v2
+    app: ratings
+    version: v2
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - ratings
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-ratings-v2:2.1.0
+      type: ImageChange
   template:
     metadata:
       annotations:
@@ -327,7 +480,7 @@ spec:
       serviceAccountName: bookinfo-ratings-v2
       containers:
         - name: ratings
-          image: quay.io/maistra/examples-bookinfo-ratings-v2:2.1.0
+          image: examples-bookinfo-ratings-v2
           imagePullPolicy: IfNotPresent
           env:
             # ratings-v2 will use mongodb as the default db backend.
@@ -348,6 +501,31 @@ spec:
               value: mongodb://mongodb:27017/test
           ports:
             - containerPort: 9080
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: examples-bookinfo-ratings-v2
+  labels:
+    app: ratings
+    version: v2
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: "2.1.0"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-ratings-v2:2.1.0
 ---
 ##################################################################################################
 # Reviews service
@@ -375,8 +553,8 @@ metadata:
   labels:
     account: reviews
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: reviews-v1
   namespace: bookinfo
@@ -386,9 +564,18 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: reviews
-      version: v1
+    app: reviews
+    version: v1
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - reviews
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-reviews-v1:2.1.0
+      type: ImageChange
   template:
     metadata:
       annotations:
@@ -400,7 +587,7 @@ spec:
       serviceAccountName: bookinfo-reviews
       containers:
         - name: reviews
-          image: quay.io/maistra/examples-bookinfo-reviews-v1:2.1.0
+          image: examples-bookinfo-reviews-v1
           imagePullPolicy: IfNotPresent
           env:
             - name: LOG_DIR
@@ -417,9 +604,34 @@ spec:
           emptyDir: {}
         - name: tmp
           emptyDir: {}
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: examples-bookinfo-reviews-v1
+  labels:
+    app: reviews
+    version: v1
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: "2.1.0"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-reviews-v1:2.1.0
+---
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: reviews-v2
   namespace: bookinfo
@@ -429,9 +641,18 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: reviews
-      version: v2
+    app: reviews
+    version: v2
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - reviews
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-reviews-v2:2.1.0
+      type: ImageChange
   template:
     metadata:
       annotations:
@@ -443,7 +664,7 @@ spec:
       serviceAccountName: bookinfo-reviews
       containers:
         - name: reviews
-          image: quay.io/maistra/examples-bookinfo-reviews-v2:2.1.0
+          image: quay.io/maistra/examples-bookinfo-reviews-v2
           imagePullPolicy: IfNotPresent
           env:
             - name: LOG_DIR
@@ -460,9 +681,34 @@ spec:
           emptyDir: {}
         - name: tmp
           emptyDir: {}
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: examples-bookinfo-reviews-v2
+  labels:
+    app: reviews
+    version: v2
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: "2.1.0"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-reviews-v2:2.1.0
+---
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: reviews-v3
   namespace: bookinfo
@@ -472,9 +718,18 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: reviews
-      version: v3
+    app: reviews
+    version: v3
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - reviews
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-reviews-v3:2.1.0
+      type: ImageChange
   template:
     metadata:
       annotations:
@@ -486,7 +741,7 @@ spec:
       serviceAccountName: bookinfo-reviews
       containers:
         - name: reviews
-          image: quay.io/maistra/examples-bookinfo-reviews-v3:2.1.0
+          image: examples-bookinfo-reviews-v3
           imagePullPolicy: IfNotPresent
           env:
             - name: LOG_DIR
@@ -503,6 +758,31 @@ spec:
           emptyDir: {}
         - name: tmp
           emptyDir: {}
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: examples-bookinfo-reviews-v3
+  labels:
+    app: reviews
+    version: v3
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: "2.1.0"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-reviews-v3:2.1.0
 ---
 ##################################################################################################
 # Productpage services
@@ -530,8 +810,8 @@ metadata:
   labels:
     account: productpage
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: DeploymentConfig
 metadata:
   name: productpage-v1
   namespace: bookinfo
@@ -541,9 +821,18 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: productpage
-      version: v1
+    app: productpage
+    version: v1
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - productpage
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-productpage-v1:2.1.0
+      type: ImageChange
   template:
     metadata:
       annotations:
@@ -555,179 +844,234 @@ spec:
       serviceAccountName: bookinfo-productpage
       containers:
         - name: productpage
-          image: quay.io/maistra/examples-bookinfo-productpage-v1:2.1.0
+          image: examples-bookinfo-productpage-v1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 9080
           volumeMounts:
             - name: tmp
               mountPath: /tmp
+          livenessProbe:
+            httpGet:
+              path: /productpage
+              port: 9080
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes:
         - name: tmp
           emptyDir: {}
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
 ---
-apiVersion: networking.istio.io/v1alpha3
-kind: Gateway
+apiVersion: image.openshift.io/v1
+kind: ImageStream
 metadata:
-  name: bookinfo-gateway
-  namespace: bookinfo
-spec:
-  selector:
-    istio: ingressgateway # use istio default controller
-  servers:
-    - port:
-        number: 80
-        name: http
-        protocol: HTTP
-      hosts:
-        - "*"
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: bookinfo
-  namespace: bookinfo
-spec:
-  hosts:
-    - "*"
-  gateways:
-    - bookinfo-gateway
-  http:
-    - match:
-        - uri:
-            exact: /productpage
-        - uri:
-            prefix: /static
-        - uri:
-            exact: /login
-        - uri:
-            exact: /logout
-        - uri:
-            prefix: /api/v1/products
-      route:
-        - destination:
-            host: productpage
-            port:
-              number: 9080
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: productpage
-spec:
-  hosts:
-    - productpage
-  http:
-    - route:
-        - destination:
-            host: productpage
-            subset: v1
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: reviews
-spec:
-  hosts:
-    - reviews
-  http:
-    - route:
-        - destination:
-            host: reviews
-            subset: v1
-          weight: 0
-        - destination:
-            host: reviews
-            subset: v2
-          weight: 0
-        - destination:
-            host: reviews
-            subset: v3
-          weight: 100
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: ratings
-spec:
-  hosts:
-    - ratings
-  http:
-    - route:
-        - destination:
-            host: ratings
-            subset: v1
----
-apiVersion: networking.istio.io/v1alpha3
-kind: VirtualService
-metadata:
-  name: details
-spec:
-  hosts:
-    - details
-  http:
-    - route:
-        - destination:
-            host: details
-            subset: v1
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mongodb
+  name: examples-bookinfo-productpage-v1
   labels:
-    app: mongodb
-    service: mongodb
-spec:
-  ports:
-    - port: 27017
-      name: mongo
-  selector:
-    app: mongodb
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: mongodb-v1
-  labels:
-    app: mongodb
+    app: productpage
     version: v1
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: mongodb
-      version: v1
-  template:
-    metadata:
-      annotations:
-        sidecar.istio.io/inject: "true"
-      labels:
-        app: mongodb
-        version: v1
-    spec:
-      containers:
-        - name: mongodb
-          image: quay.io/maistra/examples-bookinfo-mongodb:2.1.0
-          imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 27017
-          volumeMounts:
-            - name: data-db
-              mountPath: /data/db
-      volumes:
-        - name: data-db
-          emptyDir: {}
+  lookupPolicy:
+    local: false
+  tags:
+    - name: "2.1.0"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-productpage-v1:2.1.0
 ---
-apiVersion: v1
-data:
-  ca-cert.pem: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURuekNDQW9lZ0F3SUJBZ0lKQU9OMWlmckJaMi9CTUEwR0NTcUdTSWIzRFFFQkN3VUFNSUdMTVFzd0NRWUQKVlFRR0V3SlZVekVUTUJFR0ExVUVDQXdLUTJGc2FXWnZjbTVwWVRFU01CQUdBMVVFQnd3SlUzVnVibmwyWVd4bApNUTR3REFZRFZRUUtEQVZKYzNScGJ6RU5NQXNHQTFVRUN3d0VWR1Z6ZERFUU1BNEdBMVVFQXd3SFVtOXZkQ0JEClFURWlNQ0FHQ1NxR1NJYjNEUUVKQVJZVGRHVnpkSEp2YjNSallVQnBjM1JwYnk1cGJ6QWdGdzB4T0RBeE1qUXgKT1RFMU5URmFHQTh5TVRFM01USXpNVEU1TVRVMU1Wb3dXVEVMTUFrR0ExVUVCaE1DVlZNeEV6QVJCZ05WQkFnVApDa05oYkdsbWIzSnVhV0V4RWpBUUJnTlZCQWNUQ1ZOMWJtNTVkbUZzWlRFT01Bd0dBMVVFQ2hNRlNYTjBhVzh4CkVUQVBCZ05WQkFNVENFbHpkR2x2SUVOQk1JSUJJakFOQmdrcWhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0MKQVFFQXl6Q3hyL3h1MHp5NXJWQmlzbzlmZmdsMDBiUkt2Qi9IRjRBWDkveXRtWjZIcXN5MTNYSVFrOC91L0J5OQppQ3ZWd1hJTXZ5VDBDYmlKcS9hUEVqNW1KVXkwbHpiclVzMTNvbmVYcXJQWGY3aXIzSHpkUncrU0JoWGxzaDl6CkFQWkpYY0Y5M0RKVTNHYWJQS3dCdkdKMElWTUpQSUZDdURJUHdXNGtGQUk3Ui84QTVMU2RQckZ4NkV5TVhsN0sKTThqZWtDMHk5RG5UajgzL2ZZNzJXY1dYN1lUcGdaZUJIQWVlUU9QVFoyS1liRmFsMmdMc2FyNjlQZ0ZTMFRvbQpFU085TTE0WWl0N216QjFXREsyejlnM3Irekx4RU5kSjVKRy9ac2tLZStUTzREaXFpNU9KdC9oOHlzcFMxY2s4CkxKdENvbGU5OTE5dW1CeWc1b3J1ZmxxSWxRSURBUUFCb3pVd016QUxCZ05WSFE4RUJBTUNBZ1F3REFZRFZSMFQKQkFVd0F3RUIvekFXQmdOVkhSRUVEekFOZ2d0allTNXBjM1JwYnk1cGJ6QU5CZ2txaGtpRzl3MEJBUXNGQUFPQwpBUUVBbHRIRWhoeUFzdmU0SzRiTGdCWHRId1d6bzZTcEZ6ZEFmWHBMU2hwT0pOdFFORVJiM3FnNmlVR1FkWSt3CkEyQnBtU2tLcjNSdy82Q2xQNStjQ0c3ZkdvY1BhWmgrYys0TnhtOXN1TXVaQlpDdE5PZVlPTUlmdkNQY0NTKzgKUFEvMGhDNC8wSjNXSkt6R0Jzc2FhTXVmSnh6Z0ZQUHRESjk5OGtZOHJsUk9naGRTYVZ0NDIzL2pYSUFZblAzWQowNW44VEdFUkJqN1RMZHRJVmJ0VUl4M0pIQW8zUFdKeXdBNm1FRG92Rk1KaEpFUnA5c0RISXIxQmJoWEsxVEZOClo2SE5INmdJbmtTU010dkM0UHRlamI3NDlQVGFlUFJQRjdJRC8vZXEvM0FIOFVLNTBGM1RRY0xqRXFXVXNKVW4KYUZLbHRPYytSQWp6RGtsY1VQZUc0WTZlTUE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
-  ca-key.pem: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBeXpDeHIveHUwenk1clZCaXNvOWZmZ2wwMGJSS3ZCL0hGNEFYOS95dG1aNkhxc3kxCjNYSVFrOC91L0J5OWlDdlZ3WElNdnlUMENiaUpxL2FQRWo1bUpVeTBsemJyVXMxM29uZVhxclBYZjdpcjNIemQKUncrU0JoWGxzaDl6QVBaSlhjRjkzREpVM0dhYlBLd0J2R0owSVZNSlBJRkN1RElQd1c0a0ZBSTdSLzhBNUxTZApQckZ4NkV5TVhsN0tNOGpla0MweTlEblRqODMvZlk3MldjV1g3WVRwZ1plQkhBZWVRT1BUWjJLWWJGYWwyZ0xzCmFyNjlQZ0ZTMFRvbUVTTzlNMTRZaXQ3bXpCMVdESzJ6OWczcit6THhFTmRKNUpHL1pza0tlK1RPNERpcWk1T0oKdC9oOHlzcFMxY2s4TEp0Q29sZTk5MTl1bUJ5ZzVvcnVmbHFJbFFJREFRQUJBb0lCQUdaSThmblVpbm1kNVI2QgpDOTQxWEczWEZzNkdBdVVtM2hOUGNVRnVHbm50bXYvNUkwZ0JwcVN5Rk8wbkRxWWc0dThKbWE4VFRDSWttbkZOCm9nSWVGVStMaUpGaW5SM0d2d1d6VEU4clR6MUZXb2FZK005UDRFTmQvSTRwVkx4VVB1U0toZkEyQ2hBVk91cFUKOEY3RDlRL2RmQlhRUUNUM1ZvVWFDK0ZpcWpMNEh2SWhqaTF6SXFhcXBLN2ZDaEdQcmFDLzRXSHdMTU56STBaZwpvRGRBYW53VnlnZXR0dm02S0Q3QWVLemhLOTRnWDFQY25zT2kzS3V6UVl2a2VuUUUxTTYvSzdZdEVjNXFYQ1lmClFFVGowVUN6QjU1YnRnZEYzNkJHb1pYZjBMd0hxeHlzOXViZkh1aHdLQnBZMHhnMno0LzRSWFpOaGZJRGloM3cKSjNtaWhjRUNnWUVBNkZ0UTBjZmgwWm0wM09QRHBCR2M2c2RLeFR3NmFCRHRFM0t6dGZJMmhsMjZ4SFFvZUZxcApGbVYvVGJuRXhucHB3K2dXSnR3eDdJZnZvd1VEOHVSUjJQME0yd0djdFdyTXBuYUVZVGlMQVBoWHNqNjlIU00vCkNZcmg1NEtNMFlXeWp3Tmh0VXp3Yk9Ucmgxald0VDlIVjVlN2F5OUF0azNVV2xqdVI3NENGTVVDZ1lFQTM5MmUKRFZvRExFMFh0YnlzbWRsZlNmZmhpUUxQOXNUOCtiZi96WW5yOEVxLzRMV1FvT3RqRUFSYnVDajNPcTdiUDhJRQpWejQ1Z1QxbUVFM0lhY0M5bmVHd3VFYTZpY0JpdVFpODZOVzhpbFkvWmJPV3JSUExPaGszekxpWit5cWt0K3NOCmNxV3gwSmtJaDdJTUtXSTRkVlFnazRJMGpjRlA3dk5HL1NvNEFaRUNnWUVBNDI2ZVNQZ3hIUXdxY0J1d242TnQKeUpDUnEwVXNsamdiRmZJcjNXZmIzdUZYc250UU1aM3I2N1FsUzFzT05JZ1ZobUJoYm1BUnJjZlEwK3hRMVNxTwp3cW5PTDRBQWQ4SzExaW9qb1ZYTEdZUDdzc2llS3lzWXhLcGdQRThZcnUwQ3ZlRTlma3gwK09HSmVNMklPNWhZCnFIQW9UdDNOcGFQQXV6NVkzWGdxYVZFQ2dZQTBUT05TL1RlR2p4QTkvakZZMUNibDhncDM1dmRORUtLRmVNNUQKWjdoK2NBZzU2RkU4dHlGeXFZSUFHVm9CRkw3V08yNm1MenhpREVVZkEvMFJiOTBjMkpCZnpPNWhwbGVxSVBkNQpjZzNWUitjUnpJNGtLMTZzV1Izbkx5MlNOMWs2T3FqdW92VlM1WjNQamZJM2JPSUJ6MEM1Rlk5UG10MGcxeWM3Cm1EUnpjUUtCZ1FDWFdDWlN0YmRqZXdhTGQ1dTVIaGJ3OHRJV0ltTVZmY2ZzM0gxRk42NjlMTHBiQVJNOFJ0QWEKOGRZd0RWSG1XbWV2Yi9XWDAzTGlTRStHQ2pDQk83OWZhMXFjNVJLQWFscUgvMU9ZeFR1dllPZVRVZWJTcmc4KwpsUUZsUDJPQzRHR29sS3JONkhWV2R4dGYrRitTZGp3WDZxR0NmWWtYSlJMWVhJRlNGakZldXc9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
-  cert-chain.pem: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURuekNDQW9lZ0F3SUJBZ0lKQU9OMWlmckJaMi9CTUEwR0NTcUdTSWIzRFFFQkN3VUFNSUdMTVFzd0NRWUQKVlFRR0V3SlZVekVUTUJFR0ExVUVDQXdLUTJGc2FXWnZjbTVwWVRFU01CQUdBMVVFQnd3SlUzVnVibmwyWVd4bApNUTR3REFZRFZRUUtEQVZKYzNScGJ6RU5NQXNHQTFVRUN3d0VWR1Z6ZERFUU1BNEdBMVVFQXd3SFVtOXZkQ0JEClFURWlNQ0FHQ1NxR1NJYjNEUUVKQVJZVGRHVnpkSEp2YjNSallVQnBjM1JwYnk1cGJ6QWdGdzB4T0RBeE1qUXgKT1RFMU5URmFHQTh5TVRFM01USXpNVEU1TVRVMU1Wb3dXVEVMTUFrR0ExVUVCaE1DVlZNeEV6QVJCZ05WQkFnVApDa05oYkdsbWIzSnVhV0V4RWpBUUJnTlZCQWNUQ1ZOMWJtNTVkbUZzWlRFT01Bd0dBMVVFQ2hNRlNYTjBhVzh4CkVUQVBCZ05WQkFNVENFbHpkR2x2SUVOQk1JSUJJakFOQmdrcWhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0MKQVFFQXl6Q3hyL3h1MHp5NXJWQmlzbzlmZmdsMDBiUkt2Qi9IRjRBWDkveXRtWjZIcXN5MTNYSVFrOC91L0J5OQppQ3ZWd1hJTXZ5VDBDYmlKcS9hUEVqNW1KVXkwbHpiclVzMTNvbmVYcXJQWGY3aXIzSHpkUncrU0JoWGxzaDl6CkFQWkpYY0Y5M0RKVTNHYWJQS3dCdkdKMElWTUpQSUZDdURJUHdXNGtGQUk3Ui84QTVMU2RQckZ4NkV5TVhsN0sKTThqZWtDMHk5RG5UajgzL2ZZNzJXY1dYN1lUcGdaZUJIQWVlUU9QVFoyS1liRmFsMmdMc2FyNjlQZ0ZTMFRvbQpFU085TTE0WWl0N216QjFXREsyejlnM3Irekx4RU5kSjVKRy9ac2tLZStUTzREaXFpNU9KdC9oOHlzcFMxY2s4CkxKdENvbGU5OTE5dW1CeWc1b3J1ZmxxSWxRSURBUUFCb3pVd016QUxCZ05WSFE4RUJBTUNBZ1F3REFZRFZSMFQKQkFVd0F3RUIvekFXQmdOVkhSRUVEekFOZ2d0allTNXBjM1JwYnk1cGJ6QU5CZ2txaGtpRzl3MEJBUXNGQUFPQwpBUUVBbHRIRWhoeUFzdmU0SzRiTGdCWHRId1d6bzZTcEZ6ZEFmWHBMU2hwT0pOdFFORVJiM3FnNmlVR1FkWSt3CkEyQnBtU2tLcjNSdy82Q2xQNStjQ0c3ZkdvY1BhWmgrYys0TnhtOXN1TXVaQlpDdE5PZVlPTUlmdkNQY0NTKzgKUFEvMGhDNC8wSjNXSkt6R0Jzc2FhTXVmSnh6Z0ZQUHRESjk5OGtZOHJsUk9naGRTYVZ0NDIzL2pYSUFZblAzWQowNW44VEdFUkJqN1RMZHRJVmJ0VUl4M0pIQW8zUFdKeXdBNm1FRG92Rk1KaEpFUnA5c0RISXIxQmJoWEsxVEZOClo2SE5INmdJbmtTU010dkM0UHRlamI3NDlQVGFlUFJQRjdJRC8vZXEvM0FIOFVLNTBGM1RRY0xqRXFXVXNKVW4KYUZLbHRPYytSQWp6RGtsY1VQZUc0WTZlTUE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
-  root-cert.pem: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQ3VENDQXRXZ0F3SUJBZ0lKQU9JUkRoT2N4c3g2TUEwR0NTcUdTSWIzRFFFQkN3VUFNSUdMTVFzd0NRWUQKVlFRR0V3SlZVekVUTUJFR0ExVUVDQXdLUTJGc2FXWnZjbTVwWVRFU01CQUdBMVVFQnd3SlUzVnVibmwyWVd4bApNUTR3REFZRFZRUUtEQVZKYzNScGJ6RU5NQXNHQTFVRUN3d0VWR1Z6ZERFUU1BNEdBMVVFQXd3SFVtOXZkQ0JEClFURWlNQ0FHQ1NxR1NJYjNEUUVKQVJZVGRHVnpkSEp2YjNSallVQnBjM1JwYnk1cGJ6QWdGdzB4T0RBeE1qUXgKT1RFMU5URmFHQTh5TVRFM01USXpNVEU1TVRVMU1Wb3dnWXN4Q3pBSkJnTlZCQVlUQWxWVE1STXdFUVlEVlFRSQpEQXBEWVd4cFptOXlibWxoTVJJd0VBWURWUVFIREFsVGRXNXVlWFpoYkdVeERqQU1CZ05WQkFvTUJVbHpkR2x2Ck1RMHdDd1lEVlFRTERBUlVaWE4wTVJBd0RnWURWUVFEREFkU2IyOTBJRU5CTVNJd0lBWUpLb1pJaHZjTkFRa0IKRmhOMFpYTjBjbTl2ZEdOaFFHbHpkR2x2TG1sdk1JSUJJakFOQmdrcWhraUc5dzBCQVFFRkFBT0NBUThBTUlJQgpDZ0tDQVFFQTM4dUVmQWF0elFZcWJhTG91MW54SjM0OFZ5Tnp1bVlNbUREdDVwYkxZUnJDbzJwUzNraTFaVkROCjh5eElFTkpGa3BLdzlVY3RUR2RiTkd1R0NpU0RQN3VxRjZCaVZuK1hLQVUvM3BuUEZCYlRkMFMzM05xYkRFUXUKSVlyYUhTbC90U2s1ckFSYkMxRHJRUmRaNm5ZRDJLcmFwQzRnMFhialk2UHU1bDR5N0tuRndTdW5ucDl1cXBadwp1RVJ2L0JndW1KNVFsU2VTZUNtaG5EaEx4b29HOHc1dEMyeVZyMXlEcHNPSEdpbVAvbWM4Q2RzNFYwemZJaFF2Cll6ZklIcGhoRTlES2ptbmpCWUxPZGo0YXljdjQ0akhuT0djK3d2QTFKcXNsNjB0M3dnbXMrekpUaVd3QUJMZHcKemdNQWE3eXhMeW9WMCtQaVZRdWQ2ays4Wm9JRmN3SURBUUFCbzFBd1RqQWRCZ05WSFE0RUZnUVVPVVlHdFV5aApldXhPNGxHZTRPcDF5OE5Wb2Fnd0h3WURWUjBqQkJnd0ZvQVVPVVlHdFV5aGV1eE80bEdlNE9wMXk4TlZvYWd3CkRBWURWUjBUQkFVd0F3RUIvekFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBTlhMeWZBczdKOXJtQmFtR0p2UFoKbHR4MzkwV3h6ekxGUXNCUkFhSDZyZ2VpcEJxM2RSOXFFakF3YjZCVEYrUk9tdFF6WCtmanN0Q1JySnhDdG85Vwp0QzhLdlhUZFJmSWpmQ0Naamh0SU9CS3FSeEU0S0pWL1JCZnY5eEQ1bHlqdENQQ1FsM0lhNk1TZjQyTithYkFLCldDZFU2S0NvakE4V0I5WWhTQ3p6YTNhUWJQVHpkMjZPQy9KYmxKcFZndHVzNWY4SUx6Q3N6K3BiTWltZ1RraHkKQXVoWVJwcEphUTI0QVBpanNFQzkrR0lhVktQZzVJd1dyb2lQb2orUVhOcHNodXZxVlFRWHZHYVJpcTR6b1NueAp4QUp6K3c4dGpyRFdjZjgyNlZOMTRJTCsvQ21xbGcvcklmQjVDSGR3VklmV3dwdUdCNjZxL1VpUGVnWk1OczhhCjNnPT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-kind: Secret
-metadata:
-  name: cacerts
-  namespace: bookinfo
-type: Opaque
----
+#apiVersion: networking.istio.io/v1alpha3
+#kind: Gateway
+#metadata:
+#  name: bookinfo-gateway
+#  namespace: bookinfo
+#spec:
+#  selector:
+#    istio: ingressgateway # use istio default controller
+#  servers:
+#    - port:
+#        number: 80
+#        name: http
+#        protocol: HTTP
+#      hosts:
+#        - "*"
+#---
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: bookinfo
+#  namespace: bookinfo
+#spec:
+#  hosts:
+#    - "*"
+#  gateways:
+#    - bookinfo-gateway
+#  http:
+#    - match:
+#        - uri:
+#            exact: /productpage
+#        - uri:
+#            prefix: /static
+#        - uri:
+#            exact: /login
+#        - uri:
+#            exact: /logout
+#        - uri:
+#            prefix: /api/v1/products
+#      route:
+#        - destination:
+#            host: productpage
+#            port:
+#              number: 9080
+#---
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: productpage
+#spec:
+#  hosts:
+#    - productpage
+#  http:
+#    - route:
+#        - destination:
+#            host: productpage
+#            subset: v1
+#---
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: reviews
+#spec:
+#  hosts:
+#    - reviews
+#  http:
+#    - route:
+#        - destination:
+#            host: reviews
+#            subset: v1
+#          weight: 0
+#        - destination:
+#            host: reviews
+#            subset: v2
+#          weight: 0
+#        - destination:
+#            host: reviews
+#            subset: v3
+#          weight: 100
+#---
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: ratings
+#spec:
+#  hosts:
+#    - ratings
+#  http:
+#    - route:
+#        - destination:
+#            host: ratings
+#            subset: v1
+#---
+#apiVersion: networking.istio.io/v1alpha3
+#kind: VirtualService
+#metadata:
+#  name: details
+#spec:
+#  hosts:
+#    - details
+#  http:
+#    - route:
+#        - destination:
+#            host: details
+#            subset: v1
+#---
+#apiVersion: v1
+#kind: Service
+#metadata:
+#  name: mongodb
+#  labels:
+#    app: mongodb
+#    service: mongodb
+#spec:
+#  ports:
+#    - port: 27017
+#      name: mongo
+#  selector:
+#    app: mongodb
+#---
+#apiVersion: v1
+#kind: DeploymentConfig
+#metadata:
+#  name: mongodb-v1
+#  labels:
+#    app: mongodb
+#    version: v1
+#spec:
+#  replicas: 1
+#  selector:
+#    app: mongodb
+#    version: v1
+#  triggers:
+#    - type: ConfigChange
+#    - imageChangeParams:
+#        automatic: true
+#        containerNames:
+#          - mongodb
+#        from:
+#          kind: ImageStreamTag
+#          name: examples-bookinfo-mongodb:latest
+#      type: ImageChange
+#  template:
+#    metadata:
+#      annotations:
+#        sidecar.istio.io/inject: "true"
+#      labels:
+#        app: mongodb
+#        version: v1
+#    spec:
+#      containers:
+#        - name: mongodb
+#          image: quay.io/maistra/examples-bookinfo-mongodb:2.1.0
+#          imagePullPolicy: IfNotPresent
+#          ports:
+#            - containerPort: 27017
+#          volumeMounts:
+#            - name: data-db
+#              mountPath: /data/db
+#      volumes:
+#        - name: data-db
+#          emptyDir: {}
+#  strategy:
+#    resources: {}
+#    rollingParams:
+#      intervalSeconds: 1
+#      maxSurge: 25%
+#      maxUnavailable: 25%
+#      timeoutSeconds: 600
+#      updatePeriodSeconds: 1
+#    type: Rolling
+#---
+#apiVersion: v1
+#kind: ImageStream
+#metadata:
+#  labels:
+#    app: mongodb
+#    version: v1
+#  name: examples-bookinfo-mongodb
+#spec: {}
+#---
+#apiVersion: security.istio.io/v1beta1
+#kind: PeerAuthentication
+#metadata:
+#  name: "default"
+#  namespace: bookinfo
+#spec:
+#  mtls:
+#    mode: STRICT
+#---
