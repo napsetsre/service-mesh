@@ -857,6 +857,12 @@ spec:
               port: 9080
             initialDelaySeconds: 5
             periodSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /productpage
+              port: 9080
+            failureThreshold: 30
+            periodSeconds: 10
       volumes:
         - name: tmp
           emptyDir: {}
