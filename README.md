@@ -143,6 +143,20 @@ Supported load balancing policy requests are Random, Weighted, and Least
 * **Least** type requests are forwarded to the instances with the least number of requests.
 
 
+### Header Based Routing
+We can change the route configuration so that all traffic from a specific user is routed to a specific service version. 
+In this case, all traffic from a user named Bill will be routed to the service reviews:v2 and traffic from user named Fred w
+ill be routed to the service reviews:v1. This example is enabled by the fact that the productpage service adds a 
+custom end-user header to all downstream HTTP requests to the reviews service.
+
+
+1. On the /productpage of the Bookinfo application, log in as user Bill and refresh the browser. Expect to see BLACK star ratings appear next to each review.
+2. On the /productpage of the Bookinfo application, log in as user Fred and refresh the browser. Expect to see RED star ratings appear next to each review.
+
+Log in as another user (pick any name you wish). Refresh the browser; notice the stars are gone! This is because traffic is routed to reviews:v1 for all users except Bill and Fred.
+
+
+
 6. Send some traffic using the following command:
 ```bash
 for i in {1..20}; do sleep 0.25; curl -I http://${GATEWAY_URL}/productpage; done

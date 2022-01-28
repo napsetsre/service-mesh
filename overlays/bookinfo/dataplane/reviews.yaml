@@ -281,6 +281,7 @@ metadata:
 spec:
   hosts:
     - reviews
+# Weighted Routing
   http:
     - route:
         - destination:
@@ -295,4 +296,28 @@ spec:
             host: reviews
             subset: v3
           weight: 0
+
+# Header Routing
+#
+#  http:
+#    - match:
+#        - headers:
+#            end-user:
+#              exact: Bill
+#      route:
+#        - destination:
+#            host: reviews
+#            subset: v2
+#    - match:
+#        - headers:
+#            end-user:
+#              exact: Fred
+#      route:
+#        - destination:
+#            host: reviews
+#            subset: v3
+#    - route:
+#        - destination:
+#            host: reviews
+#            subset: v1
 ---
