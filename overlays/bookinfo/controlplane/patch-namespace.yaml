@@ -1,0 +1,6 @@
+- op: replace
+  path: /metadata/name
+  value: bookinfo-istio-system
+- op: replace
+  path: /metadata/labels/name
+  value: bookinfo-istio-system
