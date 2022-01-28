@@ -135,6 +135,14 @@ Expected Results
 * Route 100% traffic to **reviews-v2** service to see (Black Stars) in the browser.
 * Route 100% traffic to **reviews-v3** service to see (Red Stars) in the browser.
 
+### Load Balancing
+Supported load balancing policy requests are Random, Weighted, and Least
+
+* **Random** type requests are forwarded at random to instances in the pool. 
+* **Weighted** type requests are forwarded in the pool according to a specific percentage. 
+* **Least** type requests are forwarded to the instances with the least number of requests.
+
+
 6. Send some traffic using the following command:
 ```bash
 for i in {1..20}; do sleep 0.25; curl -I http://${GATEWAY_URL}/productpage; done
