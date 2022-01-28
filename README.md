@@ -81,7 +81,7 @@ oc get route -n bookinfo-istio-system
 
 3. Export the `Gateway` URL using the following command:
 ```bash
-export GATEWAY_URL=$(oc -n istio-system get route istio-ingressgateway -o jsonpath='{.spec.host}')
+export GATEWAY_URL=$(oc -n bookinfo-istio-system get route istio-ingressgateway -o jsonpath='{.spec.host}')
 ```
 
 4. On the http://${GATEWAY_URL}/productpage of the Bookinfo application, refresh the browser.
