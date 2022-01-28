@@ -39,9 +39,21 @@ When using a DeploymentConfig be aware that DestinationRule resources will not r
 
 > https://github.com/kiali/kiali/issues/4210
 
-## Projects
+## Demo
+We are going to use the Bookinfo application which consists of the following services:
+
+* `productpage` service that calls the reviews and ratings microservices to populate the page.
+* `details` service contains detailed book information.
+* `reviews` service contains book reviews and calls the `ratings` service. 
+* `ratings` service contains book ranking information that accompanies a book review.
+
+There are three versions of the `ratings` service:
+* **v1** does not call the ratings Service.
+* **v2** calls the ratings service and displays each rating as one to five black stars.
+* **v3** calls the ratings service and displays each rating as one to five red stars.
+
 ### Control Plane Project
-`book-istio-system` is our control plane project acting as the central controller for the service mesh.
+`book-istio-system` is the control plane project acting as the central controller for the service mesh.
 
 Resources
 * __ServiceMeshControlPlane__
