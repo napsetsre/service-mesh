@@ -44,9 +44,9 @@ When using a DeploymentConfig be aware that DestinationRule resources will not r
 `book-istio-system` is our control plane project acting as the central controller for the service mesh.
 
 Resources
-* ServiceMeshControlPlane
-* ServiceMeshMember
-* ServiceMeshMemberRoll
+* __ServiceMeshControlPlane__
+* __ServiceMeshMember__
+* __ServiceMeshMemberRoll__
 
 Verify the control plane installation status using the following command:
 ```bash
@@ -55,31 +55,17 @@ oc get smcp -n bookinfo-istio-system -w
 
 ### Data Plane Project
 
-Our `Data Plane` project is named `bookinfo`.
+`bookinfo` is the data plane project where our application resources lives.
 
+Resources
+* __Namespace__
+* __VirtualService__ 
+* __DestinationRule__
+* __Service__
+* __ServiceAccount__
+* __DeploymentConfig__
+* __ImageStream__
 
-
-1. Destination rules configure what happens to traffic after virtual service routing rules are evaluated. Apply
-   `DestinationRule` to expose v1 destinations using the following command:
-```bash
-oc apply -n bookinfo -f ./install/destination-rule-all.yaml
-```
-
-2. Think of virtual services as how traffic is routed to a given destination. Each virtual service consists of a set
-   of routing rules that are evaluated in order. So to route all traffic to subset, `v1`, only use the following command:
-```bash
-oc apply -n bookinfo -f ./install/virtual-service-all-v1.yaml
-```
-
-3. Deploy the service using the following commands:
-```bash
-oc apply -n bookinfo -f ./install/bookinfo.yaml
-```
-
-4. Deploy the `Gateway` configuration using the following command:
-```bash
-oc apply -n bookinfo -f ./install/bookinfo-gateway.yaml
-```
 
 ## Verify Deployment
 
@@ -90,7 +76,7 @@ oc get pods -n bookinfo
 
 2. List the `Tools` routes using the following command:
 ```bash
-oc get route -n istio-system
+oc get route -n bookinfo-istio-system
 ```
 
 3. Export the `Gateway` URL using the following command:
@@ -117,32 +103,18 @@ You should see that the traffic is routed to the v1 services.
 for i in {1..20}; do sleep 0.25; curl -I http://${GATEWAY_URL}/productpage; done
 ```
 
-## Walk-Through
-1. Execute the walk-through using the following command:
-```bash
-sh ./install/walk-through.sh
-```
-
-## Quick-Start
-1. Execute the quick-start using the following command:
-```bash
-sh ./install/quick-start.sh
-```
-
 ## Cleanup
 When you are finished you can remove the resources that we installed.
-> CAUTION: Removing any shared ElasticSearch, Kiali, Jeager, or Service Mesh subscriptions!
 
-1. Remove `Bookinfo` project using the following command:
+Remove both the `bookinfo` and `book-istio-system` projects using the following command:
 ```bash
-source ./cleanup.sh
+kustomize build https://github.com/napsetsre/openshift-service-mesh#main | oc delete -f-
 ```
 
 ## References
-- [Subscription](https://docs.openshift.com/container-platform/4.6/rest_api/operatorhub_apis/subscription-operators-coreos-com-v1alpha1.html)
-- [Red Hat OpenShift Command Line Tools](https://docs.openshift.com/container-platform/4.6/cli_reference/openshift_cli/getting-started-cli.html#cli-about-cli_cli-developer-commands)
-- [Red Hat Service Mesh](https://access.redhat.com/documentation/en-us/openshift_container_platform/4.6/html-single/service_mesh/index)
-- [Istio Release 1.6.14](https://istio.io/latest/news/releases/1.6.x/announcing-1.6.14/)
+- [Subscription](https://docs.openshift.com/container-platform/4.8/rest_api/operatorhub_apis/subscription-operators-coreos-com-v1alpha1.html)
+- [Red Hat OpenShift Command Line Tools](https://docs.openshift.com/container-platform/4.8/cli_reference/openshift_cli/getting-started-cli.html#cli-about-cli_cli-developer-commands)
+- [Red Hat Service Mesh](https://access.redhat.com/documentation/en-us/openshift_container_platform/4.8/html-single/service_mesh/index)
 - [Unable To Delete Project](https://access.redhat.com/solutions/4165791)
 
 

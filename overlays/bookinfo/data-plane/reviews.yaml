@@ -1,0 +1,298 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: reviews
+  namespace: bookinfo
+spec:
+  host: reviews
+  trafficPolicy:
+    tls:
+      mode: ISTIO_MUTUAL
+  subsets:
+    - name: v1
+      labels:
+        version: v1
+    - name: v2
+      labels:
+        version: v2
+    - name: v3
+      labels:
+        version: v3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: reviews
+  namespace: bookinfo
+  labels:
+    app: reviews
+    service: reviews
+spec:
+  ports:
+    - port: 9080
+      name: http
+  selector:
+    app: reviews
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: bookinfo-reviews
+  namespace: bookinfo
+  labels:
+    account: reviews
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: reviews-v1
+  namespace: bookinfo
+  labels:
+    app: reviews
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    app: reviews
+    version: v1
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - reviews
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-reviews-v1:2.1.0
+      type: ImageChange
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: reviews
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-reviews
+      containers:
+        - name: reviews
+          image: examples-bookinfo-reviews-v1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: LOG_DIR
+              value: "/tmp/logs"
+          ports:
+            - containerPort: 9080
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: wlp-output
+              mountPath: /opt/ibm/wlp/output
+      volumes:
+        - name: wlp-output
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: examples-bookinfo-reviews-v1
+  labels:
+    app: reviews
+    version: v1
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: "2.1.0"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-reviews-v1:2.1.0
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: reviews-v2
+  namespace: bookinfo
+  labels:
+    app: reviews
+    version: v2
+spec:
+  replicas: 1
+  selector:
+    app: reviews
+    version: v2
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - reviews
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-reviews-v2:2.1.0
+      type: ImageChange
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: reviews
+        version: v2
+    spec:
+      serviceAccountName: bookinfo-reviews
+      containers:
+        - name: reviews
+          image: quay.io/maistra/examples-bookinfo-reviews-v2
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: LOG_DIR
+              value: "/tmp/logs"
+          ports:
+            - containerPort: 9080
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: wlp-output
+              mountPath: /opt/ibm/wlp/output
+      volumes:
+        - name: wlp-output
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: examples-bookinfo-reviews-v2
+  labels:
+    app: reviews
+    version: v2
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: "2.1.0"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-reviews-v2:2.1.0
+---
+apiVersion: v1
+kind: DeploymentConfig
+metadata:
+  name: reviews-v3
+  namespace: bookinfo
+  labels:
+    app: reviews
+    version: v3
+spec:
+  replicas: 1
+  selector:
+    app: reviews
+    version: v3
+  triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - reviews
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-reviews-v3:2.1.0
+      type: ImageChange
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: reviews
+        version: v3
+    spec:
+      serviceAccountName: bookinfo-reviews
+      containers:
+        - name: reviews
+          image: examples-bookinfo-reviews-v3
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: LOG_DIR
+              value: "/tmp/logs"
+          ports:
+            - containerPort: 9080
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: wlp-output
+              mountPath: /opt/ibm/wlp/output
+      volumes:
+        - name: wlp-output
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
+  strategy:
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: examples-bookinfo-reviews-v3
+  labels:
+    app: reviews
+    version: v3
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: "2.1.0"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-reviews-v3:2.1.0
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: reviews
+spec:
+  hosts:
+    - reviews
+  http:
+    - route:
+        - destination:
+            host: reviews
+            subset: v1
+          weight: 0
+        - destination:
+            host: reviews
+            subset: v2
+          weight: 0
+        - destination:
+            host: reviews
+            subset: v3
+          weight: 100
+---
