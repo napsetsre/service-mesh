@@ -16,16 +16,9 @@ Operators in the service mesh control plane project.
 ```bash
 source <(oc completion bash)
 ```
-6. Clone the service mesh project using the following command:
-```bash
-git clone https://github.com/napsetsre/service-mesh.git
-```
-7. Ensure that `Curl` installed on your system.
-
-## Install
-Install the `service-mesh`.
+6. Install the `service-mesh` demo.
 ```shell
-kustomize build . | oc apply -f-
+kustomize build https://github.com/napsetsre/openshift-service-mesh#main | oc apply -f-
 ```
 
 ## Deployment vs DeploymentConfig
