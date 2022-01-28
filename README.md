@@ -101,14 +101,39 @@ export GATEWAY_URL=$(oc -n bookinfo-istio-system get route istio-ingressgateway 
 echo http://${GATEWAY_URL}/productpage
 ```
 
-You should see that the traffic is routed to the v1 services.
+## Traffic Management
+Traffic routing lets you control the flow of traffic between service versions.
 
-> An extremely entertaining play by Shakespeare. The slapstick humour is refreshing!
-> - Reviewer1
+### Request Routing
+Shift the routing weights between the different versions of the reviews service and redeploy after each change.
 
-
-> Absolutely fun and entertaining. The play lacks thematic depth when compared to other plays by Shakespeare.
-> - Reviewer2
+```yaml
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: reviews
+spec:
+  hosts:
+    - reviews
+  http:
+    - route:
+        - destination:
+            host: reviews
+            subset: v1
+          weight: 100
+        - destination:
+            host: reviews
+            subset: v2
+          weight: 0
+        - destination:
+            host: reviews
+            subset: v3
+          weight: 0
+```
+Expected Results
+* Route 100% traffic to **reviews-v1** service to see (Zero Stars) in the browser.
+* Route 100% traffic to **reviews-v2** service to see (Black Stars) in the browser.
+* Route 100% traffic to **reviews-v3** service to see (Red Stars) in the browser.
 
 6. Send some traffic using the following command:
 ```bash

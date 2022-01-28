@@ -286,7 +286,7 @@ spec:
         - destination:
             host: reviews
             subset: v1
-          weight: 0
+          weight: 100
         - destination:
             host: reviews
             subset: v2
@@ -294,5 +294,5 @@ spec:
         - destination:
             host: reviews
             subset: v3
-          weight: 100
+          weight: 0
 ---
