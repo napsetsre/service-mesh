@@ -28,13 +28,20 @@ Install the `service-mesh`.
 kustomize build . | oc apply -f-
 ```
 
-## Restart(Mac)
-If your deployment uses automatic sidecar injection, you can update the pod template in the deployment by adding or modifying an annotation. Run the following command to redeploy the pods:
+## Deployment vs DeploymentConfig
+### Deployment
+If you use Deployment resources along with automatic sidecar injection, you will need to update the pod template in the Deployment by adding or modifying an annotation. Run the following command to redeploy the pods each time you make a change to the Deployment:
 ```shell
 oc patch deployment/<deployment> -n <namespace> -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date -r seconds`'"}}}}}'
 ```
 
-### Traffic Routing
+### DeploymentConfig
+When using a DeploymentConfig be aware that DestinationRule resources will not render correctly in Kiali.
+
+> https://github.com/kiali/kiali/issues/4210
+
+
+## Traffic Routing
 You can think of virtual services as how you route your traffic to a given destination, and then you use destination rules to configure what happens to traffic for that destination. 
 
 * **Virtual service** lets you configure how requests are routed to a service.

@@ -18,7 +18,6 @@ spec:
         inbound:
           excludedPorts:
             - 15020
-  version: v2.1
   tracing:
     sampling: 100
     type: Jaeger
