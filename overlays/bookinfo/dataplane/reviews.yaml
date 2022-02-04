@@ -108,6 +108,7 @@ apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
   name: examples-bookinfo-reviews-v1
+  namespace: bookinfo
   labels:
     app: reviews
     version: v1
@@ -185,6 +186,7 @@ apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
   name: examples-bookinfo-reviews-v2
+  namepace: bookinfo
   labels:
     app: reviews
     version: v2
@@ -262,6 +264,7 @@ apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
   name: examples-bookinfo-reviews-v3
+  namespace: bookinfo
   labels:
     app: reviews
     version: v3
@@ -278,6 +281,7 @@ apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
   name: reviews
+  namespace: bookinfo
 spec:
   hosts:
     - reviews
