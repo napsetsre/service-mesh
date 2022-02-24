@@ -37,20 +37,6 @@ When using a DeploymentConfig be aware that DestinationRule resources will not r
 
 ### Service Mesh Components
 
-Maistra
-
-Jaeger
-
-ElasticSearch
-
-Kiali
-
-Prometheus
-
-Grafana
-
-For updates and latest pr
-
 #### [Istio](https://istio.io/)
 Istio is the core implementation of the service mesh architecture for the Kubernetes platform.
 Istio creates a control plane that centralizes service mesh capabilities and a data plane that
