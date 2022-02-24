@@ -35,6 +35,67 @@ When using a DeploymentConfig be aware that DestinationRule resources will not r
 
 > https://github.com/kiali/kiali/issues/4210
 
+### Service Mesh Components
+
+Maistra
+
+Jaeger
+
+ElasticSearch
+
+Kiali
+
+Prometheus
+
+Grafana
+
+For updates and latest pr
+
+#### [Istio](https://istio.io/)
+Istio is the core implementation of the service mesh architecture for the Kubernetes platform.
+Istio creates a control plane that centralizes service mesh capabilities and a data plane that
+creates the structure of the mesh.
+
+The data plane controls communications between services by injecting sidecar containers that
+capture traffic between microservices.
+
+#### [Maistra](https://maistra.io/)
+Maistra is an open-source project based on Istio that adapts Istio features to the edge cases
+of deployment in OpenShift Container Platform. Maistra also adds extended features to Istio,
+such as simplified multitenancy, explicit sidecar injection, and the use of OpenShift routes
+instead of Kubernetes ingress.
+
+#### [Jaeger](https://www.jaegertracing.io/)
+Jaeger is an open source traceability server that centralizes and displays traces associated
+with a single request. A trace contains information about all services that a request reached.
+Maistra is responsible for sending the traces to Jaeger and Jaeger is responsible for
+displaying traces. Microservices in the mesh are responsible for generating request headers
+needed for other components to generate and aggregate traces.
+
+#### [ElasticSearch](https://www.elastic.co/elasticsearch/)
+ElasticSearch is an open source, distributed, JSON-based search and analytics engine.
+Jaeger uses ElasticSearch for storing and indexing the tracing data. ElasticSearch is an
+optional component for Red Hat OpenShift Service Mesh.
+
+#### [Kiali](https://kiali.io/)
+Kiali provides service mesh observability. Kiali discovers microservices in the service mesh
+and their interactions and visually represents them. It also captures information about
+communication and services, such as the protocols used, service versions, and failure
+statistics.
+
+#### [Prometheus](https://prometheus.io/)
+Prometheus is used by OpenShift Service Mesh to store telemetry information from services.
+Kiali depends on Prometheus to obtain metrics, health status, and mesh topology.
+
+#### [Grafana](https://grafana.com/)
+Optionally, Grafana can be used to analyze service mesh metrics. Grafana provides mesh
+administrators with advanced query and metrics analysis.
+
+#### [3scale](https://www.3scale.net/)
+The 3scale Istio adapter is an optional component that integrates OpenShift Service Mesh
+with Red Hat 3scale API Management solutions. The default OpenShift Service Mesh
+installation does not include this component.
+
 ## Demo
 We are going to use the Bookinfo application which consists of the following services:
 
