@@ -23,7 +23,7 @@ kustomize build https://github.com/napsetsre/openshift-service-mesh#main | oc ap
 ```
 
 ### Heads Up
-In this demo we are going to use OpenShift DeploymentConfig and ImageStream resources. Note you could also use the Kubernetes native resources.
+In this demo we are going to use OpenShift DeploymentConfig and ImageStream resources. Note you could also use the Kubernetes native resources such as deployments.
 
 __Deployment__
 
