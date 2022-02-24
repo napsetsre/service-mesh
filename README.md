@@ -4,6 +4,9 @@ The page discusses Red Hat OpenShift Service Mesh on Red Hat OpenShift. To insta
 ## Table Of Contents
 - [Assumptions](#assumptions)
 - [Environment Variables](#environment-variables)
+- [Components](#components)
+- [Demo](#demo)
+- [References](#references)
 
 ## Assumptions
 1. Access to the `oc command`
@@ -207,7 +210,7 @@ Send some traffic using the following command:
 for i in {1..20}; do sleep 0.25; curl -I http://${GATEWAY_URL}/productpage; done
 ```
 
-## Cleanup
+### Cleanup
 When you are finished you can remove the resources that we installed.
 
 Remove both the `bookinfo` and `book-istio-system` projects using the following command:
