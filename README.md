@@ -1,8 +1,5 @@
 # service-mesh
-The page discusses how to install Red Hat OpenShift Service Mesh on Red Hat OpenShift version 4.8. To
-install the Red Hat OpenShift Service Mesh Operator, you must first install the Elasticsearch, Jaeger, and Kaili
-Operators accessible to the service mesh control plane project. For the sake of our discussion we will be deploying the 
-upstream `bookinfo` reference application to test drive our deployment.
+The page discusses Red Hat OpenShift Service Mesh on Red Hat OpenShift. To install the Red Hat OpenShift Service Mesh Operator, you must first install the Elasticsearch, Jaeger, and Kaili Operators. For the sake of discussion we will be deploying the upstream Istio `bookinfo` reference application to test drive our demo.
 
 ## Table Of Contents
 - [Assumptions](#assumptions)
