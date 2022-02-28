@@ -17,10 +17,6 @@ The page discusses Red Hat OpenShift Service Mesh on Red Hat OpenShift. To insta
 ```bash
 source <(oc completion bash)
 ```
-6. Install the demo.
-```shell
-kustomize build https://github.com/napsetsre/openshift-service-mesh#main | oc apply -f-
-```
 
 ### Heads Up
 In this demo we are going to use OpenShift DeploymentConfig and ImageStream resources. Note you could also use the Kubernetes native resources such as deployments.
@@ -86,7 +82,10 @@ with Red Hat 3scale API Management solutions. The default OpenShift Service Mesh
 installation does not include this component.
 
 ## Demo
-We are going to use the Bookinfo application which consists of the following services:
+We are going to use the Bookinfo application to install both a data plane and control plane.
+
+### Data Plane Project
+Bookinfo application consists of the following services:
 
 * `productpage` service that calls the reviews and ratings microservices to populate the page.
 * `details` service contains detailed book information.
@@ -97,6 +96,22 @@ There are three versions of the `ratings` service:
 * **v1** does not call the ratings Service.
 * **v2** calls the ratings service and displays each rating as one to five black stars.
 * **v3** calls the ratings service and displays each rating as one to five red stars.
+
+Data Plane resources:
+
+Resources
+* __Namespace__
+* __VirtualService__ 
+* __DestinationRule__
+* __Service__
+* __ServiceAccount__
+* __DeploymentConfig__
+* __ImageStream__
+
+Install the Data Plane.
+```shell
+kustomize build https://github.com/napsetsre/openshift-service-mesh#main | oc apply -f-
+```
 
 ### Control Plane Project
 `book-istio-system` is the control plane project acting as the central controller for the service mesh.
@@ -110,20 +125,6 @@ Verify the control plane installation status using the following command:
 ```bash
 oc get smcp -n bookinfo-istio-system -w
 ```
-
-### Data Plane Project
-
-`bookinfo` is the data plane project where our application resources lives.
-
-Resources
-* __Namespace__
-* __VirtualService__ 
-* __DestinationRule__
-* __Service__
-* __ServiceAccount__
-* __DeploymentConfig__
-* __ImageStream__
-
 
 ## Verify Deployment
 
