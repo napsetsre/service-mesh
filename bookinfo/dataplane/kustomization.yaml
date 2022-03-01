@@ -6,9 +6,4 @@ resources:
   - details.yaml
   - productpage.yaml
   - gateway.yaml
-bases:
-  - ../../../bases
-patches:
-  - path: patch-namespace.yaml
-    target:
-      kind: Namespace
+  - namespace.yaml

@@ -1,6 +1,0 @@
-- op: replace
-  path: /metadata/name
-  value: bookinfo
-- op: replace
-  path: /metadata/labels/name
-  value: bookinfo

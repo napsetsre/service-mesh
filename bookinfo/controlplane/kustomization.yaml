@@ -4,9 +4,4 @@ resources:
   - servicemeshcontrolplane.yaml
   - servicemeshmemberroll.yaml
   - secret.yaml
-bases:
-  - ../../../bases
-patches:
-  - path: patch-namespace.yaml
-    target:
-      kind: Namespace
+  - namespace.yaml
