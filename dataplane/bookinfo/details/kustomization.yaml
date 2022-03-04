@@ -1,0 +1,19 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - v1
+bases:
+  - ../../bases/common
+patches:
+  - path: patch-destination-rule.yaml
+    target:
+      kind: DestinationRule
+  - path: patch-service.yaml
+    target:
+      kind: Service
+  - path: patch-service-account.yaml
+    target:
+      kind: ServiceAccount
+  - path: patch-virtual-service.yaml
+    target:
+      kind: VirtualService

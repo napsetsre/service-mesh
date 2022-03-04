@@ -1,0 +1,13 @@
+- op: add
+  path: /metadata
+  value:
+    labels:
+      app: reviews
+      service: reviews
+- op: add
+  path: /spec/selector
+  value:
+      app: reviews
+- op: replace
+  path: /metadata/name
+  value: reviews

@@ -1,0 +1,16 @@
+- op: add
+  path: /metadata
+  value:
+    labels:
+      app: ratings
+      version: v1
+- op: add
+  path: /spec/tags
+  value:
+    - name: "2.1"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-ratings-v1:2.1
+- op: replace
+  path: /metadata/name
+  value: examples-bookinfo-ratings-v1
