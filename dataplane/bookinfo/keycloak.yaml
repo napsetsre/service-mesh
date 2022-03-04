@@ -8,6 +8,7 @@ items:
       labels:
         app: keycloak
       name: keycloak-data
+      namespace: bookinfo
     spec:
       accessModes:
         - ReadWriteOnce
@@ -18,6 +19,7 @@ items:
     kind: DeploymentConfig
     metadata:
       name: keycloak
+      namespace: bookinfo
       annotations:
         sidecar.istio.io/inject: "false"
     spec:
@@ -69,6 +71,7 @@ items:
     kind: Service
     metadata:
       name: keycloak
+      namespace: bookinfo
     spec:
       ports:
         - name: http
@@ -79,6 +82,7 @@ items:
   - apiVersion: route.openshift.io/v1
     kind: Route
     metadata:
+      namespace: bookinfo
       labels:
         expose: "true"
         app: keycloak
