@@ -155,7 +155,7 @@ spec:
       serviceAccountName: bookinfo-reviews
       containers:
         - name: reviews
-          image: quay.io/maistra/examples-bookinfo-reviews-v2
+          image: examples-bookinfo-reviews-v2
           imagePullPolicy: IfNotPresent
           env:
             - name: LOG_DIR
@@ -186,7 +186,7 @@ apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
   name: examples-bookinfo-reviews-v2
-  namepace: bookinfo
+  namespace: bookinfo
   labels:
     app: reviews
     version: v2
