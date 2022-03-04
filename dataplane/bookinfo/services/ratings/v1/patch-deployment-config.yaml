@@ -1,0 +1,56 @@
+- op: add
+  path: /metadata
+  value:
+    labels:
+      app: ratings
+      version: v1
+- op: replace
+  path: /metadata/name
+  value: ratings-v1
+- op: add
+  path: /spec/selector
+  value:
+    app: ratings
+    version: v1
+- op: add
+  path: /spec/triggers
+  value:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+          - ratings
+        from:
+          kind: ImageStreamTag
+          name: examples-bookinfo-ratings-v1:2.1
+      type: ImageChange
+- op: add
+  path: /spec/template
+  value:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: ratings
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-ratings
+      containers:
+        - name: ratings
+          image: examples-bookinfo-ratings-v1
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: LOG_DIR
+              value: "/tmp/logs"
+          ports:
+            - containerPort: 9080
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: wlp-output
+              mountPath: /opt/ibm/wlp/output
+      volumes:
+        - name: wlp-output
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
