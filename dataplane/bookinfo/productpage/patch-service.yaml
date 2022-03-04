@@ -1,0 +1,13 @@
+- op: add
+  path: /metadata
+  value:
+    labels:
+      app: productpage
+      service: productpage
+- op: add
+  path: /spec/selector
+  value:
+      app: productpage
+- op: replace
+  path: /metadata/name
+  value: productpage

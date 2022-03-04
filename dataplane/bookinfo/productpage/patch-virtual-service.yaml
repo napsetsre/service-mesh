@@ -1,0 +1,15 @@
+- op: add
+  path: /spec
+  value:
+    hosts:
+      - productpage
+    # Weighted Routing
+    http:
+      - route:
+          - destination:
+              host: productpage
+              subset: v1
+            weight: 100
+- op: replace
+  path: /metadata/name
+  value: productpage

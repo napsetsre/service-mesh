@@ -5,7 +5,7 @@ resources:
   - reviews
   - ratings
   - details
-  - productpage.yaml
+  - productpage
   - gateway.yaml
   - namespace.yaml
   - keycloak.yaml
