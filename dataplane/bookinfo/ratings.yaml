@@ -58,7 +58,7 @@ spec:
           - ratings
         from:
           kind: ImageStreamTag
-          name: examples-bookinfo-ratings-v1:2.1.0
+          name: examples-bookinfo-ratings-v1:2.1
       type: ImageChange
   template:
     metadata:
@@ -96,10 +96,10 @@ spec:
   lookupPolicy:
     local: false
   tags:
-    - name: "2.1.0"
+    - name: "2.1"
       from:
         kind: DockerImage
-        name: quay.io/maistra/examples-bookinfo-ratings-v1:2.1.0
+        name: quay.io/maistra/examples-bookinfo-ratings-v1:2.1
 ---
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
