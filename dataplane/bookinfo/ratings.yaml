@@ -73,8 +73,21 @@ spec:
         - name: ratings
           image: examples-bookinfo-ratings-v1
           imagePullPolicy: IfNotPresent
+          env:
+            - name: LOG_DIR
+              value: "/tmp/logs"
           ports:
             - containerPort: 9080
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+            - name: wlp-output
+              mountPath: /opt/ibm/wlp/output
+      volumes:
+        - name: wlp-output
+          emptyDir: {}
+        - name: tmp
+          emptyDir: {}
   strategy:
     resources: {}
     rollingParams:
@@ -89,6 +102,7 @@ apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
   name: examples-bookinfo-ratings-v1
+  namespace: bookinfo
   labels:
     app: ratings
     version: v1
