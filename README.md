@@ -177,10 +177,10 @@ spec:
             subset: v3
           weight: 0
 ```
-Expected Results
-* Route 100% traffic to **reviews-v1** service to see (Zero Stars) in the browser.
-* Route 100% traffic to **reviews-v2** service to see (Black Stars) in the browser.
-* Route 100% traffic to **reviews-v3** service to see (Red Stars) in the browser.
+Modify the VirtualService custom resource definition to manage the traffic.
+- First route 100% traffic to **reviews-v1** service to see (Zero Stars) in the browser. 
+- Then route 0% traffic to **reviews-v1** and then route 100% traffic to **reviews-v2** service to see (Black Stars) in the browser. 
+- Then route 0% traffic to **reviews-v2** and then route 100% traffic to **reviews-v3** service to see (Red Stars) in the browser.
 
 #### Load Balancing
 Supported load balancing policy requests are Random, Weighted, and Least
