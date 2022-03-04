@@ -108,11 +108,6 @@ Resources
 * __DeploymentConfig__
 * __ImageStream__
 
-Install the Data Plane.
-```shell
-kustomize build https://github.com/napsetsre/openshift-service-mesh#main | oc apply -f-
-```
-
 ### Control Plane Project
 `book-istio-system` is the control plane project acting as the central controller for the service mesh.
 
@@ -121,12 +116,17 @@ Resources
 * __ServiceMeshMember__
 * __ServiceMeshMemberRoll__
 
+### Install Demo
+```shell
+kustomize build https://github.com/napsetsre/openshift-service-mesh#main | oc apply -f-
+```
+
 Verify the control plane installation status using the following command:
 ```bash
 oc get smcp -n bookinfo-istio-system -w
 ```
 
-## Verify Deployment
+#### Verify Deployment
 
 1. List the running `Pods` using the following command:
 ```bash
@@ -148,10 +148,10 @@ export GATEWAY_URL=$(oc -n bookinfo-istio-system get route istio-ingressgateway 
 echo http://${GATEWAY_URL}/productpage
 ```
 
-## Traffic Management
+### Traffic Management
 Traffic routing lets you control the flow of traffic between service versions.
 
-### Request Routing
+#### Request Routing
 Shift the routing weights between the different versions of the reviews service and redeploy after each change.
 
 ```yaml
@@ -182,7 +182,7 @@ Expected Results
 * Route 100% traffic to **reviews-v2** service to see (Black Stars) in the browser.
 * Route 100% traffic to **reviews-v3** service to see (Red Stars) in the browser.
 
-### Load Balancing
+#### Load Balancing
 Supported load balancing policy requests are Random, Weighted, and Least
 
 * **Random** type requests are forwarded at random to instances in the pool. 
@@ -190,7 +190,7 @@ Supported load balancing policy requests are Random, Weighted, and Least
 * **Least** type requests are forwarded to the instances with the least number of requests.
 
 
-### Header Based Routing
+#### Header Based Routing
 We can change the route configuration so that all traffic from a specific user is routed to a specific service version. 
 In this case, all traffic from a user named Bill will be routed to the service reviews:v2 and traffic from user named Fred w
 ill be routed to the service reviews:v1. This example is enabled by the fact that the productpage service adds a 
@@ -224,5 +224,4 @@ kustomize build https://github.com/napsetsre/openshift-service-mesh#main | oc de
 - [Red Hat OpenShift Command Line Tools](https://docs.openshift.com/container-platform/4.8/cli_reference/openshift_cli/getting-started-cli.html#cli-about-cli_cli-developer-commands)
 - [Red Hat Service Mesh](https://access.redhat.com/documentation/en-us/openshift_container_platform/4.8/html-single/service_mesh/index)
 - [Unable To Delete Project](https://access.redhat.com/solutions/4165791)
-
 
