@@ -1,0 +1,18 @@
+- op: add
+  path: /metadata
+  value:
+    labels:
+      app: productpage
+      version: v1
+- op: add
+  path: /spec/tags
+  value:
+    - name: "2.1"
+      from:
+        kind: DockerImage
+        name: quay.io/maistra/examples-bookinfo-productpage-v1:2.1
+      referencePolicy:
+        type: Source
+- op: replace
+  path: /metadata/name
+  value: examples-bookinfo-productpage-v1

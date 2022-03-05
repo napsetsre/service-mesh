@@ -1,29 +1,21 @@
 # Service Mesh
 The page discusses Red Hat OpenShift Service Mesh on Red Hat OpenShift. To install the Red Hat OpenShift Service Mesh Operator, you must first install the Elasticsearch, Jaeger, and Kaili Operators. For the sake of discussion we will be deploying the upstream Istio `bookinfo` reference application to test drive our demo.
 
-## Table Of Contents
-- [Assumptions](#assumptions)
-- [Environment Variables](#environment-variables)
-- [Components](#components)
-- [Demo](#demo)
-- [References](#references)
-
 ## Assumptions
 1. Access to the `oc command`
-2. Access to a user with cluster-admin permissions
-3. Access to OpenShift Container Platform 
-4. Red Hat Service Mesh Operator installed
-5. Enable auto-completion using the following command:
-```bash
-source <(oc completion bash)
-```
+2. Access to OCP version 4.X: ```oc get clusterversion```
+3. Logged into OCP with cluster-admin permissions
 
 ### Heads Up
-In this demo we are going to use OpenShift DeploymentConfig and ImageStream resources. Note you could also use the Kubernetes native resources such as deployments.
+In this demo we are going to use OpenShift DeploymentConfig and ImageStream resources. Note you could also use the 
+Kubernetes native resources such as deployments.
 
 __Deployment__
 
-If you use Deployment resources along with automatic sidecar injection, you will need to update the pod template in the Deployment by adding or modifying an annotation. Run the following command to redeploy the pods each time you make a change to the Deployment:
+If you use Deployment resources along with automatic sidecar injection, you will need to update the pod template in the 
+Deployment by adding or modifying an annotation. 
+
+Execute the following command to redeploy the `Pods` each time you make a change to a Deployment:
 ```shell
 oc patch deployment/<deployment> -n <namespace> -p '{"spec":{"template":{"metadata":{"annotations":{"kubectl.kubernetes.io/restartedAt": "'`date -r seconds`'"}}}}}'
 ```
@@ -84,22 +76,16 @@ installation does not include this component.
 ## Demo
 We are going to use the Bookinfo application to install both a data plane and control plane.
 
-### Data Plane Project
-Bookinfo application consists of the following services:
+### Data Plane 
+The Bookinfo application consists of the following services:
 
 * `productpage` service that calls the reviews and ratings microservices to populate the page.
 * `details` service contains detailed book information.
 * `reviews` service contains book reviews and calls the `ratings` service. 
 * `ratings` service contains book ranking information that accompanies a book review.
 
-There are three versions of the `ratings` service:
-* **v1** does not call the ratings Service.
-* **v2** calls the ratings service and displays each rating as one to five black stars.
-* **v3** calls the ratings service and displays each rating as one to five red stars.
+#### Resources:
 
-Data Plane resources:
-
-Resources
 * __Namespace__
 * __VirtualService__ 
 * __DestinationRule__
@@ -108,42 +94,75 @@ Resources
 * __DeploymentConfig__
 * __ImageStream__
 
-### Control Plane Project
-`book-istio-system` is the control plane project acting as the central controller for the service mesh.
+### Control Plane
+`book-istio-system` is the ControlPlane project acts as the central controller for the service mesh.
 
 Resources
 * __ServiceMeshControlPlane__
 * __ServiceMeshMember__
 * __ServiceMeshMemberRoll__
 
-### Install Demo
+### Demo Install 
+
+#### Install Subscriptions 
+Execute the following command to install the ControlPlane:
 ```shell
-kustomize build https://github.com/napsetsre/openshift-service-mesh#main | oc apply -f-
+kustomize build subscriptions | oc apply -f-
 ```
 
-Verify the control plane installation status using the following command:
+> __Note:__ Please wait for the successful installation of the Subscriptions.
+
+#### Install ControlPlane
+Execute the following command to install the ControlPlane:
+```shell
+kustomize build control-plane | oc apply -f-
+```
+
+Verify the installation status using the following command:
 ```bash
 oc get smcp -n bookinfo-istio-system -w
 ```
 
-#### Verify Deployment
-
-1. List the running `Pods` using the following command:
+List the running `Pods` using the following command:
 ```bash
-oc get pods -n bookinfo
+oc get pods -n bookinfo-isto-system
 ```
 
-2. List the `Tools` routes using the following command:
+List the running `Deployment` using the following command:
+```bash
+oc get deployment -n bookinfo-istio-system
+```
+
+#### Install DataPlane 
+Execute the following command to install the DataPlane:
+```shell
+kustomize build data-plane | oc apply -f-
+```
+
+List the running `DeploymentConfigs` using the following command:
+```bash
+oc get dc -n bookinfo | grep -iv "completed"
+```
+
+List the running `Pods` using the following command:
+```bash
+oc get pods -n bookinfo | grep -iv "completed"
+```
+> __Note:__ make sure that two containers are running for each pod.
+
+#### Verify Deployment
+
+List the `Tools` routes using the following command:
 ```bash
 oc get route -n bookinfo-istio-system
 ```
 
-3. Export the `Gateway` URL using the following command:
+Export the `Gateway` URL using the following command:
 ```bash
 export GATEWAY_URL=$(oc -n bookinfo-istio-system get route istio-ingressgateway -o jsonpath='{.spec.host}')
 ```
 
-4. On the http://${GATEWAY_URL}/productpage of the Bookinfo application, refresh the browser.
+On the http://${GATEWAY_URL}/productpage of the Bookinfo application, refresh the browser.
 ```bash
 echo http://${GATEWAY_URL}/productpage
 ```
@@ -188,7 +207,6 @@ Supported load balancing policy requests are Random, Weighted, and Least
 * **Random** type requests are forwarded at random to instances in the pool. 
 * **Weighted** type requests are forwarded in the pool according to a specific percentage. 
 * **Least** type requests are forwarded to the instances with the least number of requests.
-
 
 #### Header Based Routing
 We can change the route configuration so that all traffic from a specific user is routed to a specific service version. 
