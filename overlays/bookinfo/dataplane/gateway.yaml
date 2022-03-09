@@ -2,7 +2,7 @@
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
-  name: bookinfo-gateway
+  name: gateway
   namespace: bookinfo
 spec:
   selector:
@@ -34,7 +34,7 @@ spec:
   hosts:
     - "*"
   gateways:
-    - bookinfo-gateway
+    - gateway
   http:
     - match:
         - uri:
